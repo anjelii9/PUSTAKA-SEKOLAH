@@ -1,0 +1,113 @@
+@extends("layouts.app")
+@section("title", "Profil Saya")
+@section("content")
+<div class="container" style="padding:48px 24px;">
+    <h2 style="font-size:32px; margin-bottom:8px;">Profil Saya</h2>
+    <p style="color:var(--ink-soft); font-size:14px; margin-bottom:28px;">Data diri, status keanggotaan, dan riwayat peminjaman buku kamu.</p>
+
+    @if($totalDenda > 0)
+        <div style="background:#f7eae8; border:1px solid var(--unavailable); color:var(--unavailable); padding:16px 20px; border-radius:6px; margin-bottom:28px; display:flex; gap:12px; align-items:flex-start;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>
+                <div style="font-weight:700; text-transform:uppercase; font-size:13px; letter-spacing:.03em;">Ada denda yang perlu dilunasi</div>
+                <div style="font-size:14px; margin-top:4px;">
+                    Total denda dari {{ $transaksiDenda->count() }} transaksi: <strong>Rp {{ number_format($totalDenda, 0, ",", ".") }}</strong>.
+                    Silakan lunasi denda ini ke petugas perpustakaan saat mengembalikan/meminjam buku berikutnya.
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <div style="display:grid; grid-template-columns: 1fr 1.4fr; gap:24px; align-items:start;">
+
+        <div class="card">
+            <h3 style="font-size:16px; text-transform:none; letter-spacing:normal; margin-bottom:16px;">Data Diri</h3>
+
+            <div style="margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--line);">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); margin-bottom:2px;">Kode Anggota</div>
+                <div style="font-weight:700;">{{ $member->member_code ?? "-" }}</div>
+                <span class="badge {{ ($member->status ?? "") === "aktif" ? "badge-available" : "badge-unavailable" }}" style="margin-top:6px;">
+                    {{ $member ? ucfirst($member->status) : "Belum terdaftar sebagai anggota" }}
+                </span>
+            </div>
+
+            <form method="POST" action="{{ route("student.profile.update") }}">
+                @csrf @method("PUT")
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" name="name" class="form-control" value="{{ old("name", $user->name) }}" required>
+                    @error("name") <div class="error-text">{{ $message }}</div> @enderror
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ old("email", $user->email) }}" required>
+                    @error("email") <div class="error-text">{{ $message }}</div> @enderror
+                </div>
+                <div class="form-group">
+                    <label>Kelas</label>
+                    <input type="text" name="class" class="form-control" value="{{ old("class", $member->class ?? "") }}">
+                </div>
+                <div class="form-group">
+                    <label>No. HP</label>
+                    <input type="text" name="phone" class="form-control" value="{{ old("phone", $user->phone) }}">
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <input type="text" name="address" class="form-control" value="{{ old("address", $member->address ?? "") }}">
+                </div>
+                <div class="form-group">
+                    <label>Password Baru (opsional)</label>
+                    <input type="password" name="password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Konfirmasi Password Baru</label>
+                    <input type="password" name="password_confirmation" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-solid" style="width:100%;">Simpan Perubahan</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size:16px; text-transform:none; letter-spacing:normal; margin-bottom:16px;">Riwayat Peminjaman</h3>
+            <p style="font-size:12px; color:var(--ink-soft); margin-top:-12px; margin-bottom:16px;">Data ini sama persis dengan yang dicatat petugas di dashboard admin.</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr><th>Buku</th><th>Pinjam</th><th>Jatuh Tempo</th><th>Kembali</th><th>Status</th><th>Denda</th></tr>
+                </thead>
+                <tbody>
+                @forelse($transactions as $t)
+                    <tr>
+                        <td>{{ $t->book->title ?? "-" }}</td>
+                        <td>{{ $t->borrow_date?->format("d-m-Y") }}</td>
+                        <td>{{ $t->due_date?->format("d-m-Y") }}</td>
+                        <td>{{ $t->return_date ? $t->return_date->format("d-m-Y") : "-" }}</td>
+                        <td>
+                            <span class="badge {{ $t->status === "dikembalikan" ? "badge-available" : ($t->status === "terlambat" ? "badge-unavailable" : "badge-late") }}">
+                                {{ ucfirst($t->status) }}
+                            </span>
+                        </td>
+                        <td>
+                            @if($t->fine > 0)
+                                <span style="color:var(--unavailable); font-weight:700;">Rp {{ number_format($t->fine, 0, ",", ".") }}</span>
+                            @else
+                                <span style="color:var(--ink-soft);">-</span>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="6">Kamu belum memiliki riwayat peminjaman.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<style>
+@media (max-width: 900px){
+    .container > div[style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
+}
+</style>
+@endsection

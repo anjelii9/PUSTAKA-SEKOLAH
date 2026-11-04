@@ -18,7 +18,10 @@
         </div>
     @endif
 
-    <div style="display:grid; grid-template-columns: 1fr 1.4fr; gap:24px; align-items:start;">
+    {{-- NOTIFIKASI LOKASI BUKU + STATUS BOOKING + DAFTAR BOOKING SAYA --}}
+    @include("student.profile._booking-notifications")
+
+    <div class="profile-grid">
 
         <div class="card">
             <h3 style="font-size:16px; text-transform:none; letter-spacing:normal; margin-bottom:16px;">Data Diri</h3>
@@ -71,23 +74,30 @@
             <h3 style="font-size:16px; text-transform:none; letter-spacing:normal; margin-bottom:16px;">Riwayat Peminjaman</h3>
             <p style="font-size:12px; color:var(--ink-soft); margin-top:-12px; margin-bottom:16px;">Data ini sama persis dengan yang dicatat petugas di dashboard admin.</p>
 
-            <table class="data-table">
+            <table class="data-table table-stack">
                 <thead>
-                    <tr><th>Buku</th><th>Pinjam</th><th>Jatuh Tempo</th><th>Kembali</th><th>Status</th><th>Denda</th></tr>
+                    <tr>
+                        <th>Buku</th>
+                        <th>Pinjam</th>
+                        <th>Jatuh Tempo</th>
+                        <th>Kembali</th>
+                        <th>Status</th>
+                        <th>Denda</th>
+                    </tr>
                 </thead>
                 <tbody>
                 @forelse($transactions as $t)
                     <tr>
-                        <td>{{ $t->book->title ?? "-" }}</td>
-                        <td>{{ $t->borrow_date?->format("d-m-Y") }}</td>
-                        <td>{{ $t->due_date?->format("d-m-Y") }}</td>
-                        <td>{{ $t->return_date ? $t->return_date->format("d-m-Y") : "-" }}</td>
-                        <td>
+                        <td data-label="Buku">{{ $t->book->title ?? "-" }}</td>
+                        <td data-label="Pinjam">{{ $t->borrow_date?->format("d-m-Y") }}</td>
+                        <td data-label="Jatuh Tempo">{{ $t->due_date?->format("d-m-Y") }}</td>
+                        <td data-label="Kembali">{{ $t->return_date ? $t->return_date->format("d-m-Y") : "-" }}</td>
+                        <td data-label="Status">
                             <span class="badge {{ $t->status === "dikembalikan" ? "badge-available" : ($t->status === "terlambat" ? "badge-unavailable" : "badge-late") }}">
                                 {{ ucfirst($t->status) }}
                             </span>
                         </td>
-                        <td>
+                        <td data-label="Denda">
                             @if($t->fine > 0)
                                 <span style="color:var(--unavailable); font-weight:700;">Rp {{ number_format($t->fine, 0, ",", ".") }}</span>
                             @else
@@ -104,10 +114,4 @@
 
     </div>
 </div>
-
-<style>
-@media (max-width: 900px){
-    .container > div[style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
-}
-</style>
 @endsection

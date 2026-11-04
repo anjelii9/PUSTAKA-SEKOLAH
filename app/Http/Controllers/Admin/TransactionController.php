@@ -12,19 +12,10 @@ use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
+    // Daftar transaksi sekarang ada di Dashboard, jadi alamat lama ini hanya mengalihkan.
     public function index(Request $request)
     {
-        $transactions = Transaction::with(["book", "member"])
-            ->when($request->status, fn ($q) => $q->where("status", $request->status))
-            ->when($request->q, function ($q) use ($request) {
-                $q->whereHas("book", fn ($b) => $b->where("title", "like", "%{$request->q}%"))
-                  ->orWhereHas("member", fn ($m) => $m->where("name", "like", "%{$request->q}%"));
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return view("admin.transactions.index", compact("transactions"));
+        return redirect()->route("admin.dashboard", $request->query());
     }
 
     public function create()
@@ -46,8 +37,7 @@ class TransactionController extends Controller
         $book = Book::findOrFail($validated["book_id"]);
 
         if (! $book->isAvailable()) {
-            // INI BAGIAN YANG TADI SALAH KETIK, SEKARANG SUDAH BENAR
-            return back()->with("error", "Stok buku '{$book->title}' sedang habis / tidak tersedia.")->withInput();
+            return back()->with("error", "Stok buku \"{$book->title}\" sedang habis / tidak tersedia.")->withInput();
         }
 
         $lamaPinjam = (int) config("perpustakaan.lama_pinjam_hari", 7);
@@ -67,7 +57,7 @@ class TransactionController extends Controller
 
         $book->decrement("stock");
 
-        return redirect()->route("admin.transactions.index")->with("success", "Peminjaman berhasil dicatat. Jatuh tempo: {$dueDate->format('d-m-Y')}.");
+        return redirect()->route("admin.dashboard")->with("success", "Peminjaman berhasil dicatat. Jatuh tempo: {$dueDate->format('d-m-Y')}.");
     }
 
     public function show(Transaction $transaction)
@@ -109,7 +99,7 @@ class TransactionController extends Controller
             ? "Buku dikembalikan dengan keterlambatan. Denda: Rp " . number_format($fine, 0, ",", ".")
             : "Buku berhasil dikembalikan tepat waktu.";
 
-        return redirect()->route("admin.transactions.index")->with("success", $pesan);
+        return redirect()->route("admin.dashboard")->with("success", $pesan);
     }
 
     public function updateStatus(Transaction $transaction)

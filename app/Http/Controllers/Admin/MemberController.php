@@ -67,6 +67,12 @@ class MemberController extends Controller
         return redirect()->route("admin.members.index")->with("success", "Anggota berhasil ditambahkan.");
     }
 
+    // Halaman cetak kartu anggota
+    public function card(Member $member)
+    {
+        return view("admin.members.card", compact("member"));
+    }
+
     public function edit(Member $member)
     {
         return view("admin.members.edit", compact("member"));

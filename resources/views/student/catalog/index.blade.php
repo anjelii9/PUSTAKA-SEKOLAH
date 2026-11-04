@@ -21,20 +21,28 @@
 
     <div class="book-grid reveal-stagger">
         @forelse($books as $book)
-            <a href="{{ route('student.catalog.show', $book) }}" class="book-card">
-                <div class="book-cover">
-                    @if($book->cover)
-                        <img src="{{ asset('storage/'.$book->cover) }}" alt="{{ $book->title }}">
-                    @else
-                        <span style="font-family:'Archivo Expanded'; font-size:13px; color:var(--ink-soft); text-align:center; padding:12px;">{{ $book->title }}</span>
-                    @endif
-                </div>
-                <span class="badge {{ $book->isAvailable() ? 'badge-available' : 'badge-unavailable' }}">
-                    {{ $book->isAvailable() ? 'Tersedia ('.$book->stock.' unit)' : 'Dipinjam Semua' }}
-                </span>
-                <div class="book-title">{{ $book->title }}</div>
-                <div class="book-meta">{{ $book->category->name ?? '-' }} &middot; {{ $book->author }}</div>
-            </a>
+            <div class="book-card">
+                <a href="{{ route('student.catalog.show', $book) }}" style="text-decoration:none; color:inherit; display:block;">
+                    <div class="book-cover">
+                        @if($book->cover_url)
+                         <img src="{{ $book->cover_url }}" alt="{{ $book->title }}">
+                        @else
+                            <span style="font-family:'Archivo Expanded'; font-size:13px; color:var(--ink-soft); text-align:center; padding:12px;">{{ $book->title }}</span>
+                        @endif
+                    </div>
+                    <span class="badge {{ $book->isAvailable() ? 'badge-available' : 'badge-unavailable' }}">
+                        {{ $book->isAvailable() ? 'Tersedia ('.$book->stock.' unit)' : 'Dipinjam Semua' }}
+                    </span>
+                    <div class="book-title">{{ $book->title }}</div>
+                    <div class="book-meta">{{ $book->category->name ?? '-' }} &middot; {{ $book->author }}</div>
+                </a>
+
+                @if($book->isAvailable())
+                    <a href="{{ route('student.booking.create', $book) }}" class="btn btn-solid" style="display:block; text-align:center; margin-top:8px; font-size:11px; padding:8px 12px;">Booking</a>
+                @else
+                    <span class="btn" style="display:block; text-align:center; margin-top:8px; font-size:11px; padding:8px 12px; opacity:.5; cursor:not-allowed;">Stok Habis</span>
+                @endif
+            </div>
         @empty
             <p>Buku tidak ditemukan untuk pencarian ini.</p>
         @endforelse

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -11,7 +12,7 @@ class ProfileController extends Controller
 {
     // Dashboard profil: bio data + riwayat peminjaman (data yang sama persis
     // dengan yang dilihat admin, karena diambil dari tabel transactions yang sama)
-    // + notifikasi kalau ada denda yang belum lunas.
+    // + notifikasi kalau ada denda yang belum lunas + notifikasi & daftar booking.
     public function edit(Request $request)
     {
         $user = $request->user();
@@ -24,7 +25,25 @@ class ProfileController extends Controller
         $totalDenda = $transactions->sum("fine");
         $transaksiDenda = $transactions->where("fine", ">", 0);
 
-        return view("student.profile.edit", compact("user", "member", "transactions", "totalDenda", "transaksiDenda"));
+        $bookings = collect();
+        $bookingNotifications = collect();
+
+        if ($member) {
+            Booking::autoCancelExpired();
+
+            $bookings = $member->bookings()->with("book")->latest("booking_date")->latest("pickup_time")->get();
+
+            // Notifikasi: booking yang baru saja dikonfirmasi/dibatalkan dan belum dilihat siswa
+            $bookingNotifications = $bookings->where("is_read", false)->whereIn("status", ["dikonfirmasi", "dibatalkan"]);
+
+            if ($bookingNotifications->isNotEmpty()) {
+                $member->bookings()->whereIn("id", $bookingNotifications->pluck("id"))->update(["is_read" => true]);
+            }
+        }
+
+        return view("student.profile.edit", compact(
+            "user", "member", "transactions", "totalDenda", "transaksiDenda", "bookings", "bookingNotifications"
+        ));
     }
 
     public function update(Request $request)

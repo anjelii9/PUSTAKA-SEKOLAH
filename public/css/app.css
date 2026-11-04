@@ -132,21 +132,40 @@ a{ color: inherit; text-decoration: none; }
 .section-head h2{ font-size: clamp(28px, 4vw, 44px); }
 .section-head .sub{ color: var(--ink-soft); font-size:14px; margin-top:8px; }
 
-.category-grid{ display:grid; grid-template-columns: repeat(5,1fr); gap:16px; }
+/* ================= KATEGORI (kartu tanpa foto) ================= */
+.category-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:20px; }
+
 .category-card{
-  position:relative; height: 220px; border-radius: 4px; overflow:hidden;
-  background-size:cover; background-position:center; display:flex; align-items:flex-end;
-  transition: background-size .5s cubic-bezier(.16,1,.3,1), box-shadow .25s ease;
+  position:relative; display:flex; flex-direction:column; gap:10px;
+  min-height:170px; padding:26px 26px 22px;
+  background:#fff; border:1px solid var(--line); border-top:3px solid var(--gold);
+  border-radius:6px; overflow:hidden;
+  transition: transform .25s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease;
 }
-.category-card:hover{ background-size: 112%; box-shadow: 0 12px 32px rgba(22,20,15,.25); }
-.category-card::after{ content:""; position:absolute; inset:0; background: rgba(22,20,15,.42); transition: background .25s ease; }
-.category-card:hover::after{ background: rgba(22,20,15,.58); }
-.category-card span{
-  position:relative; z-index:2; color:#fff; padding: 18px; font-family:"Archivo Expanded";
-  text-transform:uppercase; font-weight:800; font-size: 18px; letter-spacing:.02em;
-  transition: transform .3s ease;
+.category-card:hover{
+  transform: translateY(-4px);
+  background: linear-gradient(180deg, var(--mahogany-light) 0%, var(--mahogany-dark) 100%);
+  border-color: var(--mahogany-line);
+  border-top-color: var(--gold);
+  box-shadow: 0 14px 28px rgba(22,20,15,.18);
 }
-.category-card:hover span{ transform: translateY(-4px); }
+.category-card .cat-name{
+  display:block; font-family:"Archivo Expanded", "Archivo", sans-serif;
+  text-transform:uppercase; font-weight:800; font-size:18px; letter-spacing:.02em;
+  color: var(--ink); transition: color .25s ease;
+}
+.category-card .cat-desc{
+  display:block; font-size:14px; line-height:1.6; color: var(--ink-soft);
+  transition: color .25s ease;
+}
+.category-card .cat-meta{
+  display:block; margin-top:auto; padding-top:8px;
+  font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em;
+  color: var(--accent); transition: color .25s ease;
+}
+.category-card:hover .cat-name{ color: var(--gold-light); }
+.category-card:hover .cat-desc{ color: var(--gold-text); }
+.category-card:hover .cat-meta{ color: var(--gold); }
 
 .book-grid{ display:grid; grid-template-columns: repeat(4,1fr); gap: 28px 20px; }
 .book-card{ display:flex; flex-direction:column; gap:10px; transition: transform .25s ease; }
@@ -244,7 +263,6 @@ body{ animation: page-fade .35s ease; }
 [data-sidebar-drawer] a:hover{ background: rgba(198,161,91,.12); padding-left:28px; transition: padding-left .2s ease, background .2s ease; }
 
 @media (max-width: 1024px){
-  .category-grid{ grid-template-columns: repeat(3,1fr); }
   .book-grid{ grid-template-columns: repeat(3,1fr); }
   .testi-grid{ grid-template-columns: repeat(1,1fr); }
 }
@@ -253,9 +271,326 @@ body{ animation: page-fade .35s ease; }
   .nav-left{ order:3; width:100%; justify-content:center; gap:20px; }
   .nav-logo{ order:1; }
   .nav-right{ order:2; }
-  .category-grid{ grid-template-columns: repeat(2,1fr); }
   .book-grid{ grid-template-columns: repeat(2,1fr); }
   .hero-content h1{ font-size: 42px; }
   .sidebar{ width:100%; min-height:auto; display:flex; overflow-x:auto; }
   .sidebar a{ padding:12px 16px; white-space:nowrap; border-left:none; border-bottom:3px solid transparent; }
+}
+
+/* Kategori: HP 2 kolom, layar sangat kecil 1 kolom */
+@media (max-width: 640px){
+  .category-grid{ grid-template-columns: repeat(2,1fr); gap:14px; }
+  .category-card{ min-height:150px; padding:20px 18px 18px; }
+}
+@media (max-width: 420px){
+  .category-grid{ grid-template-columns: 1fr; }
+}
+
+/* ================= ADMIN RESPONSIVE ================= */
+.admin-topbar{ display:none; }
+.admin-overlay{ display:none; }
+.admin-main{ flex:1; min-width:0; padding:32px; }
+
+/* Tablet & laptop kecil: kartu statistik 5 kolom -> 3 kolom */
+@media (max-width: 1200px){
+  .admin-main [style*="repeat(5"]{ grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+}
+
+/* HP & tablet: sidebar jadi menu geser (hamburger) */
+@media (max-width: 900px){
+  body.admin-body{ display:block !important; }
+
+  .admin-topbar{
+    display:flex; align-items:center; gap:12px;
+    position:sticky; top:0; z-index:40;
+    padding:12px 16px;
+    background: linear-gradient(180deg, var(--mahogany-light) 0%, var(--mahogany-dark) 100%);
+    color: var(--gold-light);
+    box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  }
+  .admin-topbar .brand{ font-family:'Bebas Neue', sans-serif; font-size:20px; letter-spacing:.06em; }
+  .admin-menu-btn{
+    all:unset; box-sizing:border-box; cursor:pointer;
+    width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(241,221,176,.4); border-radius:6px; color: var(--gold-light);
+  }
+
+  .sidebar{
+    position:fixed !important; top:0; left:0; bottom:0;
+    width:260px !important; min-height:100vh; display:block !important;
+    overflow-y:auto; overflow-x:hidden;
+    transform: translateX(-100%); transition: transform .28s ease;
+    z-index:60;
+  }
+  .sidebar.open{ transform: translateX(0); }
+  .sidebar a{ white-space:normal; padding:12px 24px; border-left:3px solid transparent; border-bottom:none; }
+
+  .admin-overlay{
+    display:block; position:fixed; inset:0; z-index:50;
+    background: rgba(0,0,0,.5);
+    opacity:0; pointer-events:none; transition: opacity .25s ease;
+  }
+  .admin-overlay.active{ opacity:1; pointer-events:auto; }
+
+  .admin-main{ padding:16px !important; }
+  .admin-main h1{ font-size:22px !important; }
+  .admin-main div[style*="display:flex"]{ flex-wrap:wrap; }
+
+  /* Form filter/pencarian: input & tombol turun ke bawah, lebar penuh */
+  .admin-main form[style*="display:flex"]{ flex-wrap:wrap; width:100%; }
+  .admin-main form[style*="display:flex"] > *{ flex:1 1 140px; min-width:0; }
+  .admin-main .form-control{ max-width:100%; }
+  .admin-main select.form-control{ width:100% !important; }
+
+  /* Kartu & tabel: tabel bisa digeser ke samping */
+  .admin-main .card{ padding:16px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table.data-table{ min-width:560px; }
+  table.data-table td[style*="display:flex"]{ display:table-cell !important; white-space:nowrap; }
+  table.data-table td form{ display:inline-block; }
+
+  /* Kartu statistik: 2 kolom */
+  .admin-main [style*="repeat(5"],
+  .admin-main [style*="repeat(3"]{ grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  .stat-card{ padding:16px; }
+  .stat-card .num{ font-size:28px; }
+
+  /* Grid dua kolom di halaman lain jadi satu kolom */
+  .admin-main [style*="grid-template-columns: 1fr"],
+  .admin-main [style*="grid-template-columns:1fr"]{ grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 480px){
+  .admin-main [style*="repeat(5"],
+  .admin-main [style*="repeat(3"]{ grid-template-columns: 1fr !important; }
+}
+
+/* ================= ADMIN TOOLBAR (cari + filter + tombol tambah) ================= */
+.admin-toolbar{
+  display:flex; flex-direction:column; align-items:flex-start;
+  gap:12px; margin-bottom:20px;
+}
+.admin-filter{
+  display:flex; flex-wrap:wrap; align-items:stretch; gap:8px;
+  width:100%; max-width:760px;
+}
+.admin-main .admin-filter .form-control,
+.admin-main .admin-filter select.form-control{ width:auto !important; min-width:0; }
+.admin-filter .filter-search{ flex:2 1 120px; }
+.admin-filter .filter-select{ flex:1 1 110px; }
+.admin-filter .btn{ flex:0 0 auto; }
+
+/* Tombol tambah: lebih kecil & melebar (persegi panjang) */
+.btn-add{
+  display:inline-block; padding:8px 30px;
+  font-size:12px; letter-spacing:.06em; line-height:1.2;
+}
+
+/* ================= STUDENT RESPONSIVE ================= */
+
+/* Grid halaman Profil Saya: Data Diri + Riwayat */
+.profile-grid{ display:grid; grid-template-columns:1fr 1.4fr; gap:24px; align-items:start; }
+.profile-grid > *{ min-width:0; }
+
+@media (max-width: 900px){
+  .profile-grid{ grid-template-columns:1fr; }
+  main .card{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+}
+
+/* HP & tablet kecil */
+@media (max-width: 768px){
+
+  /* Navbar dua baris: [menu + logo] lalu [cari + ikon] */
+  .navbar{ flex-wrap:wrap; gap:10px; padding:12px 16px; }
+  .navbar > .icon-btn[data-sidebar-toggle]{ order:1; margin:0 !important; }
+
+  /* margin-left = jarak antara tombol menu/silang dan tulisan Pustaka Sekolah */
+  .navbar .nav-logo{ order:2; flex:1; text-align:left; font-size:22px; margin-left:16px; }
+
+  .navbar .nav-left{ display:none; }
+  .navbar .nav-right{ order:3; flex:1 1 100%; width:100%; gap:8px; justify-content:flex-start; }
+  .navbar .nav-right > form:first-child{ flex:1; min-width:0; }
+  .navbar .nav-right input.form-control{ width:100% !important; }
+  .navbar .nav-right > a.btn[href*="/student/catalog"],
+  .navbar .nav-right > a.btn[href*="/admin/dashboard"]{ display:none; }
+
+  /* Isi halaman */
+  main .container[style*="padding"]{ padding:28px 16px !important; }
+  main h2{ font-size:24px !important; }
+  main .card{ padding:16px; }
+
+  /* Footer: ditumpuk, logo di atas, rata tengah */
+  .site-footer{ padding:28px 16px; margin-top:40px; }
+  .site-footer .container{
+    flex-direction:column; text-align:center; padding:0;
+    gap:8px !important;
+  }
+  .site-footer .nav-logo{ order:0; flex:none; text-align:center !important; font-size:22px; margin-left:0; }
+  .site-footer p{ font-size:12px; line-height:1.5; margin:0; }
+
+  /* Tabel jadi kartu bertumpuk (class table-stack + data-label) */
+  table.table-stack{ min-width:0 !important; display:block; }
+  table.table-stack thead{ display:none; }
+  table.table-stack tbody,
+  table.table-stack tr,
+  table.table-stack td{ display:block; width:100%; }
+  table.table-stack tr{
+    border:1px solid var(--line); border-radius:6px;
+    padding:8px 14px; margin-bottom:12px; background:#fff;
+  }
+  table.table-stack td{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:8px 0; border-bottom:1px dashed var(--line); text-align:right;
+  }
+  table.table-stack td:last-child{ border-bottom:none; }
+  table.table-stack td::before{
+    content:attr(data-label); flex-shrink:0; text-align:left;
+    font-size:11px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.05em; color:var(--ink-soft);
+  }
+  /* baris "belum ada data" */
+  table.table-stack td[colspan]{ display:block; text-align:left; border-bottom:none; }
+  table.table-stack td[colspan]::before{ content:none; }
+
+  /* Hilangkan kotak luar supaya tidak ada kotak di dalam kotak */
+  main .card:has(> table.table-stack){
+    background:transparent; border:none; padding:0; overflow:visible;
+  }
+}
+
+/* ================= MENU GESER: jarak tombol silang dengan tulisan ================= */
+[data-sidebar-close]{
+  flex-shrink: 0;
+}
+
+[data-sidebar-drawer] .nav-logo{
+  margin-left: 22px;
+  font-size: 20px;
+}
+
+/* ================= FOOTER SELALU DI DASAR LAYAR ================= */
+body:not(.admin-body){
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+body:not(.admin-body) > main{
+  flex: 1 0 auto;
+  width: 100%;
+  padding-bottom: 40px;
+}
+
+body:not(.admin-body) > .site-footer{
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+/* ================= DASHBOARD: KARTU STATISTIK ================= */
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(5, minmax(0,1fr));
+  gap:16px;
+  margin-bottom:36px;
+}
+.stat-tile{
+  position:relative;
+  display:flex; align-items:center; gap:16px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:20px 20px 20px 24px;
+  overflow:hidden;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.stat-tile::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+  background:var(--gold);
+}
+.stat-tile:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 28px rgba(22,20,15,.1);
+  border-color:var(--gold);
+}
+.stat-icon{
+  width:48px; height:48px; flex-shrink:0;
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(198,161,91,.16);
+  color:var(--mahogany-light);
+}
+.stat-tile .num{
+  font-family:"Archivo Expanded", sans-serif;
+  font-size:30px; font-weight:800; line-height:1;
+}
+.stat-tile .label{
+  margin-top:6px;
+  font-size:11px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.06em;
+  color:var(--ink-soft);
+}
+.stat-tile.is-danger::before{ background:var(--unavailable); }
+.stat-tile.is-danger .stat-icon{ background:rgba(154,59,47,.12); color:var(--unavailable); }
+.stat-tile.is-danger .num{ color:var(--unavailable); }
+.stat-tile.is-danger:hover{ border-color:var(--unavailable); }
+
+.panel-head{
+  display:flex; align-items:baseline; gap:12px;
+  margin-bottom:14px;
+}
+.panel-title{
+  font-size:22px;
+}
+.panel-sub{
+  font-size:13px; color:var(--ink-soft);
+}
+
+/* ================= DASHBOARD: RESPONSIF ================= */
+
+/* Laptop / jendela sedang: baris atas 3 kartu, baris bawah 2 kartu selebar penuh (tanpa ruang kosong) */
+@media (max-width: 1359px){
+  .stat-grid{ grid-template-columns:repeat(6, minmax(0,1fr)); }
+  .stat-tile{ grid-column:span 2; }
+  .stat-tile:nth-child(n+4){ grid-column:span 3; }
+}
+
+/* Tablet: 2 kolom, kartu terakhir selebar penuh */
+@media (max-width: 1100px){
+  .stat-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .stat-tile,
+  .stat-tile:nth-child(n+4){ grid-column:auto; }
+  .stat-tile:last-child{ grid-column:1 / -1; }
+}
+
+/* Tablet kecil: kartu statistik sedikit lebih ringkas */
+@media (max-width: 900px){
+  .stat-tile{ padding:16px 16px 16px 20px; }
+  .stat-tile .num{ font-size:26px; }
+}
+
+/* HP kecil: 1 kolom */
+@media (max-width: 480px){
+  .stat-grid{ grid-template-columns:1fr; }
+  .stat-tile:last-child{ grid-column:auto; }
+}
+
+/* Tabel: bisa digeser ke samping, isi tidak patah-patah */
+.table-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.aksi-buttons{ display:flex; gap:8px; }
+.aksi-buttons .btn{ padding:6px 14px; }
+
+@media (min-width: 769px){
+  table.data-table.dash-table{ min-width:900px; }
+  .dash-table th,
+  .dash-table td{ white-space:nowrap; }
+  .dash-table td.col-buku{ white-space:normal; min-width:220px; }
+}
+
+/* HP: tiap transaksi jadi satu kartu */
+@media (max-width: 768px){
+  .admin-main .dash-card{
+    background:transparent; border:none; padding:0; overflow:visible;
+  }
+  .dash-table td.col-buku{ max-width:none; }
+  .aksi-buttons{ justify-content:flex-end; flex-wrap:wrap; }
+  .panel-head{ flex-wrap:wrap; gap:4px 12px; }
 }

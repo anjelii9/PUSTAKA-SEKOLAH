@@ -17,7 +17,10 @@
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns: 1fr 1.4fr; gap:24px; align-items:start;">
+    
+    <?php echo $__env->make("student.profile._booking-notifications", \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
+    <div class="profile-grid">
 
         <div class="card">
             <h3 style="font-size:16px; text-transform:none; letter-spacing:normal; margin-bottom:16px;">Data Diri</h3>
@@ -85,24 +88,31 @@ unset($__errorArgs, $__bag); ?>
             <h3 style="font-size:16px; text-transform:none; letter-spacing:normal; margin-bottom:16px;">Riwayat Peminjaman</h3>
             <p style="font-size:12px; color:var(--ink-soft); margin-top:-12px; margin-bottom:16px;">Data ini sama persis dengan yang dicatat petugas di dashboard admin.</p>
 
-            <table class="data-table">
+            <table class="data-table table-stack">
                 <thead>
-                    <tr><th>Buku</th><th>Pinjam</th><th>Jatuh Tempo</th><th>Kembali</th><th>Status</th><th>Denda</th></tr>
+                    <tr>
+                        <th>Buku</th>
+                        <th>Pinjam</th>
+                        <th>Jatuh Tempo</th>
+                        <th>Kembali</th>
+                        <th>Status</th>
+                        <th>Denda</th>
+                    </tr>
                 </thead>
                 <tbody>
                 <?php $__empty_1 = true; $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr>
-                        <td><?php echo e($t->book->title ?? "-"); ?></td>
-                        <td><?php echo e($t->borrow_date?->format("d-m-Y")); ?></td>
-                        <td><?php echo e($t->due_date?->format("d-m-Y")); ?></td>
-                        <td><?php echo e($t->return_date ? $t->return_date->format("d-m-Y") : "-"); ?></td>
-                        <td>
+                        <td data-label="Buku"><?php echo e($t->book->title ?? "-"); ?></td>
+                        <td data-label="Pinjam"><?php echo e($t->borrow_date?->format("d-m-Y")); ?></td>
+                        <td data-label="Jatuh Tempo"><?php echo e($t->due_date?->format("d-m-Y")); ?></td>
+                        <td data-label="Kembali"><?php echo e($t->return_date ? $t->return_date->format("d-m-Y") : "-"); ?></td>
+                        <td data-label="Status">
                             <span class="badge <?php echo e($t->status === "dikembalikan" ? "badge-available" : ($t->status === "terlambat" ? "badge-unavailable" : "badge-late")); ?>">
                                 <?php echo e(ucfirst($t->status)); ?>
 
                             </span>
                         </td>
-                        <td>
+                        <td data-label="Denda">
                             <?php if($t->fine > 0): ?>
                                 <span style="color:var(--unavailable); font-weight:700;">Rp <?php echo e(number_format($t->fine, 0, ",", ".")); ?></span>
                             <?php else: ?>
@@ -119,12 +129,5 @@ unset($__errorArgs, $__bag); ?>
 
     </div>
 </div>
-
-<style>
-@media (max-width: 900px){
-    .container > div[style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
-}
-</style>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make("layouts.app", \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\perpus\resources\views/student/profile/edit.blade.php ENDPATH**/ ?>

@@ -26,7 +26,6 @@ class BookingController extends Controller
         return $slots;
     }
 
-    // Halaman peraturan + form pilih jam pengambilan, sebelum booking disimpan
     public function create(Request $request, Book $book)
     {
         Booking::autoCancelExpired();
